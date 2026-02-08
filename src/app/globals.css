@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-babylon-bg: #0B0D2E;
+  --color-babylon-card: #111340;
+  --color-babylon-border: #1A1F4E;
+  --color-babylon-coral: #E85D75;
+  --color-babylon-gold: #F0C040;
+  --color-babylon-teal: #2DD4A0;
+  --color-babylon-purple: #6C5CE7;
+  --color-babylon-text: #F5F5F5;
+  --color-babylon-muted: #8B8FAD;
+  --color-babylon-warm: #D4A574;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: var(--color-babylon-bg);
+  color: var(--color-babylon-text);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* RainbowKit theme overrides */
+[data-rk] {
+  --rk-colors-accentColor: var(--color-babylon-gold) !important;
 }
