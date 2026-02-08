@@ -14,7 +14,7 @@ import { useRariRefund } from "@/hooks/useRariRefund";
 import { useGardensCheck } from "@/hooks/useGardensCheck";
 
 // TODO: Replace with actual donation address
-const DONATION_ADDRESS = "0x0000000000000000000000000000000000000000";
+const DONATION_ADDRESS = "0x1B75525aCD9C5E9E93b4AAD0E596E464e86FF5aF";
 
 export default function Home() {
   const { address: connectedAddress } = useAccount();
