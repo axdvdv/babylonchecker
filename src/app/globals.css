@@ -21,8 +21,3 @@ body {
   color: var(--color-babylon-text);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
-
-/* RainbowKit theme overrides */
-[data-rk] {
-  --rk-colors-accentColor: var(--color-babylon-gold) !important;
-}
