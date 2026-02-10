@@ -2,7 +2,7 @@
 
 import { useReadContracts } from "wagmi";
 import { type Address } from "viem";
-import { RARI_REFUND_ADDRESS, RARI_REFUND_ABI } from "@/config/rariRefund";
+import { RARI_REFUND_ADDRESS, RARI_REFUND_ABI } from "./config";
 
 export function useRariRefund(address: Address | undefined, enabled: boolean) {
   const { data, isLoading, isError } = useReadContracts({

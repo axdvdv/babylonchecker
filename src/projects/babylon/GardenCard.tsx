@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { type Address, zeroAddress } from "viem";
-import { type GardenResult } from "@/hooks/useGardensCheck";
-import { GARDEN_ABI } from "@/config/gardens";
+import { type GardenResult } from "./useGardensCheck";
+import { GARDEN_ABI } from "./config";
 import { formatTokenAmount, truncateAddress } from "@/lib/formatting";
-import { CopyField } from "./CopyField";
+import { CopyField } from "@/components/CopyField";
 
 const GARDEN_ARTICLE_URL =
   "https://medium.com/babylon-finance/babylon-finance-is-shutting-down-b58abf1bc251";
@@ -17,8 +17,9 @@ interface GardenCardProps {
 }
 
 export function GardenCard({ result, userAddress }: GardenCardProps) {
+  const { address: connectedAddress } = useAccount();
   const [expanded, setExpanded] = useState(false);
-  const { writeContract, data: txHash, isPending } = useWriteContract();
+  const { writeContract, data: txHash, isPending, error: txError } = useWriteContract();
   const { isLoading: isTxConfirming, isSuccess: isTxConfirmed } =
     useWaitForTransactionReceipt({ hash: txHash });
 
@@ -33,7 +34,7 @@ export function GardenCard({ result, userAddress }: GardenCardProps) {
   };
 
   return (
-    <div className="rounded-xl border border-babylon-border bg-babylon-card transition-colors hover:border-babylon-purple/40">
+    <div className="rounded-xl border border-uf-border bg-uf-surface transition-colors hover:border-uf-link/40">
       {/* Summary row */}
       <button
         onClick={() => setExpanded(!expanded)}
@@ -41,17 +42,17 @@ export function GardenCard({ result, userAddress }: GardenCardProps) {
       >
         <div className="min-w-0 flex-1">
           <span className="text-sm font-medium">{result.name}</span>
-          <span className="ml-2 font-mono text-xs text-babylon-muted">
+          <span className="ml-2 font-mono text-xs text-uf-muted">
             {truncateAddress(result.address)}
           </span>
         </div>
         <div className="ml-3 flex items-center gap-2">
-          <span className="text-base font-bold text-babylon-teal">
+          <span className="text-base font-bold text-uf-success">
             {formatTokenAmount(result.withdrawable, result.reserveDecimals)}{" "}
-            <span className="text-sm font-normal text-babylon-muted">{result.reserveSymbol}</span>
+            <span className="text-sm font-normal text-uf-muted">{result.reserveSymbol}</span>
           </span>
           <svg
-            className={`h-3.5 w-3.5 text-babylon-muted transition-transform ${expanded ? "rotate-180" : ""}`}
+            className={`h-3.5 w-3.5 text-uf-muted transition-transform ${expanded ? "rotate-180" : ""}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -63,46 +64,47 @@ export function GardenCard({ result, userAddress }: GardenCardProps) {
 
       {/* Expanded: claim actions */}
       {expanded && (
-        <div className="border-t border-babylon-border px-4 py-3 space-y-2">
+        <div className="border-t border-uf-border px-4 py-3 space-y-2">
           <div className="flex gap-2">
-            {userAddress ? (
-              <button
-                onClick={handleWithdraw}
-                disabled={isPending || isTxConfirming || isTxConfirmed}
-                className="flex-1 rounded-lg bg-babylon-teal px-4 py-2 text-sm font-semibold
-                  text-babylon-bg transition-all hover:brightness-110
-                  disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isPending
+            <button
+              onClick={connectedAddress ? handleWithdraw : undefined}
+              disabled={!connectedAddress || isPending || isTxConfirming || isTxConfirmed}
+              className="flex-1 rounded-lg bg-uf-success px-4 py-2 text-sm font-semibold
+                text-uf-bg transition-all hover:brightness-110
+                disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {!connectedAddress
+                ? "Connect Wallet"
+                : isPending
                   ? "Confirm in wallet..."
                   : isTxConfirming
                     ? "Confirming..."
                     : isTxConfirmed
                       ? "Withdrawn!"
                       : "Withdraw via Wallet"}
-              </button>
-            ) : (
-              <span className="flex-1 text-xs text-babylon-coral py-2">
-                Connect wallet to withdraw directly
-              </span>
-            )}
+            </button>
             <a
               href={GARDEN_ARTICLE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center rounded-lg border border-babylon-border px-3 py-2
-                text-xs text-babylon-purple/80 transition-colors hover:border-babylon-purple hover:text-babylon-purple"
+              className="flex items-center rounded-lg border border-uf-border px-3 py-2
+                text-xs text-uf-link/80 transition-colors hover:border-uf-link hover:text-uf-link"
             >
               Guide
             </a>
           </div>
+          {txError && (
+            <p className="text-xs text-uf-danger">
+              {"shortMessage" in txError ? txError.shortMessage : txError.message}
+            </p>
+          )}
 
           {isTxConfirmed && txHash && (
             <a
               href={`https://etherscan.io/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center text-xs text-babylon-teal hover:underline"
+              className="block text-center text-xs text-uf-success hover:underline"
             >
               View on Etherscan &rarr;
             </a>
@@ -110,8 +112,8 @@ export function GardenCard({ result, userAddress }: GardenCardProps) {
 
           {/* Etherscan manual params */}
           <details className="group">
-            <summary className="cursor-pointer text-xs text-babylon-muted hover:text-babylon-text">
-              Etherscan manual: call <code className="text-babylon-text">withdraw</code> with params
+            <summary className="cursor-pointer text-xs text-uf-muted hover:text-uf-text">
+              Etherscan manual: call <code className="text-uf-text">withdraw</code> with params
             </summary>
             <div className="mt-1.5 space-y-1">
               <CopyField label="Contract" value={result.address} />

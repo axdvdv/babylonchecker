@@ -1,21 +1,22 @@
-# Babylon Finance Recovery Check
+# Unclaimed Finance
 
 ## Project Overview
 
-Web3 dApp that checks if an Ethereum address has recoverable funds from the defunct Babylon Finance protocol (shut down Nov 2022 after the Rari Capital hack). Two types of checks:
+Multi-project web3 dApp that checks if an Ethereum address has recoverable funds from failed DeFi protocols. Modular architecture — each project is a self-contained module with its own hooks, components, and config.
 
-1. **Rari Refund** — check `daiReimbursementAmount` and `claimed` status on RariRefund contract
-2. **Babylon Gardens** (~45 contracts) — check `balanceOf` across all garden vaults, fetch details for non-zero balances, calculate withdrawable amount
+Currently supports:
+1. **Babylon Finance** — Rari refund (DAI) + ~50 garden vaults (WETH, USDC, DAI)
+2. **Placeholder** — template for adding new projects
 
 Users can claim funds directly via connected wallet or manually through Etherscan using displayed parameters.
 
 ## Tech Stack
 
 - **Next.js 16** (App Router) + React 19 + TypeScript
-- **Tailwind CSS v4** (`@theme inline` syntax in globals.css)
+- **Tailwind CSS v4** (`@theme inline` syntax in globals.css) + **shadcn/ui** deps (clsx, tailwind-merge, cva, lucide-react)
 - **wagmi v3 + viem** for Ethereum interaction
 - **@tanstack/react-query** for caching
-- **Wallet**: injected connector only (MetaMask/browser extensions). No WalletConnect, no RainbowKit (still in package.json but unused — can be removed)
+- **Wallet**: injected connector only (MetaMask/browser extensions). No WalletConnect, no RainbowKit
 - **RPC**: Public fallback RPCs (eth.public-rpc.com, ankr, publicnode, 1rpc.io) — no API keys needed
 - **Deploy target**: Vercel
 
@@ -34,33 +35,62 @@ src/
 ├── app/
 │   ├── layout.tsx          # Root layout, fonts, metadata
 │   ├── providers.tsx       # WagmiProvider + QueryClientProvider
-│   ├── page.tsx            # Main page — input, results, donation
-│   └── globals.css         # Tailwind v4 @theme with babylon-* color tokens
+│   ├── page.tsx            # Main page — hero, search, project grid
+│   └── globals.css         # Tailwind v4 @theme with uf-* color tokens
 ├── components/
-│   ├── AddressInput.tsx    # Address input with validation, "Use Wallet" button
+│   ├── AddressSearch.tsx   # Centered search bar with Check button
 │   ├── ConnectWallet.tsx   # Custom wallet connect (injected() connector)
 │   ├── CopyField.tsx       # Single-line clickable copy widget
-│   ├── GardenCard.tsx      # Expandable garden card — withdraw + Etherscan params
-│   ├── GardensList.tsx     # Garden results list with loading skeletons
-│   ├── RariRefundCard.tsx  # Rari refund card — claim + Etherscan instructions
-│   └── TotalSummary.tsx    # Aggregated totals by token
+│   └── ProjectGrid.tsx     # Iterates over project registry, renders cards
+├── projects/
+│   ├── types.ts            # ProjectModule, ProjectMeta, ProjectCardProps
+│   ├── registry.ts         # Central registry — add new projects here
+│   ├── babylon/
+│   │   ├── index.ts        # Project metadata + Card export
+│   │   ├── config.ts       # Garden addresses, ABIs, Rari contract
+│   │   ├── useGardensCheck.ts  # Two-phase multicall garden checker
+│   │   ├── useRariRefund.ts    # Rari refund data reader
+│   │   ├── BabylonCard.tsx # Wrapper card — orchestrates sub-components
+│   │   ├── GardenCard.tsx  # Expandable garden card with withdraw
+│   │   ├── GardensList.tsx # Garden results list with loading skeletons
+│   │   ├── RariRefundCard.tsx  # Rari refund card with claim
+│   │   └── TotalSummary.tsx    # Aggregated totals by token
+│   └── placeholder/
+│       ├── index.ts        # Example project metadata
+│       └── PlaceholderCard.tsx  # "Coming Soon" stub card
 ├── config/
-│   ├── gardens.ts          # Garden addresses (~45), GARDEN_ABI, ERC20_ABI
-│   ├── rariRefund.ts       # RariRefund address + ABI
 │   └── wagmi.ts            # Wagmi config (mainnet, injected, fallback RPCs)
-├── hooks/
-│   ├── useGardensCheck.ts  # Two-phase multicall garden checker
-│   └── useRariRefund.ts    # Rari refund data reader
 └── lib/
     ├── calculations.ts     # withdrawable = shares * lastPricePerShare / 10^decimals
-    └── formatting.ts       # formatTokenAmount, truncateAddress
+    ├── formatting.ts       # formatTokenAmount, truncateAddress
+    └── utils.ts            # cn() helper (clsx + tailwind-merge)
 ```
+
+## Adding a New Project
+
+1. Create `src/projects/<name>/`
+2. Define `config.ts` with contract addresses and ABIs
+3. Create a check hook (e.g., `useCheck.ts`)
+4. Create a `Card` component implementing `ProjectCardProps` (`{ address, enabled }`)
+5. Export a `ProjectModule` from `index.ts`
+6. Add to `src/projects/registry.ts`
+
+Each project Card is self-contained: it calls its own hooks, manages loading/error states, and renders results + claim UI.
 
 ## Key Technical Details
 
-### Garden Check — Two-Phase Multicall
+### Project Module Interface
 
-Phase 1: `balanceOf(address)` for all ~45 gardens (single multicall)
+```typescript
+interface ProjectModule {
+  meta: ProjectMeta;  // id, name, description, incident, chain
+  Card: ComponentType<ProjectCardProps>;  // { address: Address, enabled: boolean }
+}
+```
+
+### Babylon: Garden Check — Two-Phase Multicall
+
+Phase 1: `balanceOf(address)` for all gardens (single multicall)
 Phase 2: For gardens with balance > 0, fetch: `name`, `decimals`, `lastPricePerShare`, `reserveAsset`
 Phase 2b: For unique reserve assets, fetch ERC20 `symbol` + `decimals`
 
@@ -69,45 +99,39 @@ Phase 2b: For unique reserve assets, fetch ERC20 `symbol` + `decimals`
 ```
 withdrawable = userShares * lastPricePerShare / 10^gardenDecimals
 ```
-Result is in reserve asset units (wei for WETH, 1e6 for USDC, etc.)
 
 ### Claim Methods
 
 - **Rari**: `claimReimbursement()` — no params, calls RariRefund contract
 - **Garden**: `withdraw(balance, 1, userAddress, false, 0x0...0)` — on the garden contract itself
 
-### Smart Contracts
-
-- **RariRefund**: `0x2c1270a714F650F68f80e83850d85d003082B456`
-- **Gardens**: ~45 addresses listed in `src/config/gardens.ts` (DAI, USDC, WETH categories)
-
 ## Design System
 
-Babylon-themed dark web3 UI. Color tokens defined in globals.css:
+Dark finance-themed UI. Color tokens defined in globals.css with `uf-*` prefix:
 
-- `babylon-bg`: #0B0D2E (deep navy background)
-- `babylon-card`: #111340 (card background)
-- `babylon-border`: #1A1F4E
-- `babylon-gold`: #F0C040 (primary accent, check button, totals)
-- `babylon-teal`: #2DD4A0 (positive/claim actions)
-- `babylon-purple`: #6C5CE7 (links, connect wallet)
-- `babylon-coral`: #E85D75 (errors, disconnect)
-- `babylon-text`: #F5F5F5
-- `babylon-muted`: #8B8FAD
+- `uf-bg`: #0A0C1A (deep dark background)
+- `uf-surface`: #111327 (card/surface background)
+- `uf-border`: #1E2245
+- `uf-primary`: #3B82F6 (blue — buttons, brand)
+- `uf-accent`: #F59E0B (amber — monetary amounts, highlights)
+- `uf-success`: #22C55E (green — claim actions, positive states)
+- `uf-link`: #818CF8 (indigo — links, wallet connect)
+- `uf-danger`: #EF4444 (red — errors, destructive actions)
+- `uf-text`: #F1F5F9 (primary text)
+- `uf-muted`: #64748B (secondary text)
 
 ## Conventions
 
 - All components are `"use client"` (wagmi hooks require client-side)
 - BigInt for all token amounts — tsconfig target is ES2020
-- Compact UI: token symbol inline with amount, minimal vertical spacing
-- Show only gardens with balance > 0
-- Display amounts in reserve token (not USD)
-- Etherscan manual claim params always available as fallback (builds trust)
-- Donation address in page.tsx is placeholder `0x000...` — to be replaced
+- Each project is a self-contained module under `src/projects/`
+- Show only items with balance > 0
+- Display amounts in native token (not USD)
+- Etherscan manual claim params always available as fallback
+- Donation address: `0x1B75525aCD9C5E9E93b4AAD0E596E464e86FF5aF`
 
-## Known Issues / TODO
+## Deployment
 
-- `@rainbow-me/rainbowkit` in package.json but unused — safe to remove
-- RainbowKit CSS override in globals.css (`[data-rk]`) — can be removed
-- Donation address is placeholder zero address
-- `layout.tsx` metadata title says "Babylon Checker" — could update to "Babylon Finance Recovery Check"
+- **Repo**: https://github.com/axdvdv/babylonchecker
+- **Live**: https://babylonchecker-rho.vercel.app/
+- **Platform**: Vercel (auto-deploy from main branch)

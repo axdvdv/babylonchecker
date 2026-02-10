@@ -1,10 +1,7 @@
-import { type Address } from "viem";
+import { getAddress } from "viem";
 
-// TODO: Replace with actual contract address
-export const RARI_REFUND_ADDRESS: Address =
-  "0x2c1270a714F650F68f80e83850d85d003082B456";
+export const RARI_REFUND_ADDRESS = getAddress("0x2c1270a714F650F68f80e83850d85d003082B456");
 
-// Only functions used by the UI (read + claim)
 export const RARI_REFUND_ABI = [
   {
     inputs: [],

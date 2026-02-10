@@ -7,7 +7,7 @@ import {
   GARDEN_ADDRESSES,
   GARDEN_ABI,
   ERC20_ABI,
-} from "@/config/gardens";
+} from "./config";
 import { calculateWithdrawable } from "@/lib/calculations";
 
 export interface GardenResult {

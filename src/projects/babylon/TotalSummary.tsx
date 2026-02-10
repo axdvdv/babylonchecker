@@ -1,19 +1,13 @@
 "use client";
 
-import { type GardenResult } from "@/hooks/useGardensCheck";
+import { type GardenResult } from "./useGardensCheck";
 import { formatTokenAmount } from "@/lib/formatting";
 
 interface TotalSummaryProps {
   gardenResults: GardenResult[];
-  rariDaiAmount: bigint;
-  rariClaimed: boolean;
 }
 
-export function TotalSummary({
-  gardenResults,
-  rariDaiAmount,
-  rariClaimed,
-}: TotalSummaryProps) {
+export function TotalSummary({ gardenResults }: TotalSummaryProps) {
   const tokenTotals = new Map<string, { amount: bigint; decimals: number }>();
 
   for (const r of gardenResults) {
@@ -26,26 +20,17 @@ export function TotalSummary({
     }
   }
 
-  if (rariDaiAmount > 0n && !rariClaimed) {
-    const existing = tokenTotals.get("DAI");
-    if (existing) {
-      existing.amount += rariDaiAmount;
-    } else {
-      tokenTotals.set("DAI", { amount: rariDaiAmount, decimals: 18 });
-    }
-  }
-
   const entries = Array.from(tokenTotals.entries());
   if (entries.length === 0) return null;
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-babylon-gold/30 bg-babylon-card px-5 py-3">
-      <span className="text-sm font-medium text-babylon-gold">Total Recoverable</span>
+    <div className="flex items-center justify-between rounded-xl border border-uf-accent/30 bg-uf-surface px-5 py-3">
+      <span className="text-sm font-medium text-uf-accent">Total Recoverable</span>
       <div className="flex items-center gap-4">
         {entries.map(([token, { amount, decimals }]) => (
           <span key={token} className="text-base font-bold">
             {formatTokenAmount(amount, decimals)}{" "}
-            <span className="text-sm font-normal text-babylon-muted">{token}</span>
+            <span className="text-sm font-normal text-uf-muted">{token}</span>
           </span>
         ))}
       </div>

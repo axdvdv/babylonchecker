@@ -12,8 +12,8 @@ export function ConnectWallet() {
     return (
       <button
         onClick={() => disconnect()}
-        className="rounded-xl border border-babylon-border bg-babylon-card px-4 py-2
-          text-sm font-mono transition-colors hover:border-babylon-coral"
+        className="rounded-xl border border-uf-border bg-uf-surface px-4 py-2
+          text-sm font-mono transition-colors hover:border-uf-danger"
       >
         {truncateAddress(address)}
       </button>
@@ -23,7 +23,7 @@ export function ConnectWallet() {
   return (
     <button
       onClick={() => connect({ connector: connectors[0] })}
-      className="rounded-xl bg-babylon-purple px-4 py-2 text-sm font-medium
+      className="rounded-xl bg-uf-link px-4 py-2 text-sm font-medium
         transition-colors hover:brightness-110"
     >
       Connect Wallet
