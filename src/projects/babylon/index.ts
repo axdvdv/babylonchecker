@@ -8,6 +8,7 @@ export const babylonProject: ProjectModule = {
     description: "DeFi asset management vaults from Babylon Finance",
     incident: "Babylon Finance shut down Nov 2022. ~50 garden vaults still hold withdrawable positions (WETH, USDC, DAI).",
     chain: "Ethereum",
+    chainId: 1,
     asset: "WETH / USDC / DAI",
     website: "https://www.babylon.finance/",
     tvl: {

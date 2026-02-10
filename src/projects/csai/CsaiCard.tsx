@@ -15,7 +15,7 @@ import {
 import { type ProjectCardProps } from "../types";
 import { useCsaiCheck } from "./useCsaiCheck";
 
-export function CsaiCard({ address, enabled }: ProjectCardProps) {
+export function CsaiCard({ address, enabled, chainId }: ProjectCardProps) {
   const { cSaiBalance, saiAmount, wethAmount, needsApprove, isLoading, isError } =
     useCsaiCheck(address, enabled);
 
@@ -77,6 +77,7 @@ export function CsaiCard({ address, enabled }: ProjectCardProps) {
 
   const handleRedeem = () => {
     writeRedeem({
+      chainId,
       address: CSAI_ADDRESS,
       abi: CSAI_ABI,
       functionName: "redeem",
@@ -86,6 +87,7 @@ export function CsaiCard({ address, enabled }: ProjectCardProps) {
 
   const handleApprove = () => {
     writeApprove({
+      chainId,
       address: SAI_ADDRESS,
       abi: SAI_ABI,
       functionName: "approve",
@@ -95,6 +97,7 @@ export function CsaiCard({ address, enabled }: ProjectCardProps) {
 
   const handleCash = () => {
     writeCash({
+      chainId,
       address: CAGE_FREE_ADDRESS,
       abi: CAGE_FREE_ABI,
       functionName: "freeCash",

@@ -8,6 +8,7 @@ export const kintoProject: ProjectModule = {
     description: "Leftover USDC claim from Kinto protocol",
     incident: "Unclaimed USDC leftovers available for eligible users.",
     chain: "Ethereum",
+    chainId: 1,
     asset: "USDC",
     tvl: {
       type: "balance",

@@ -8,6 +8,7 @@ export const placeholderProject: ProjectModule = {
     description: "Have a protocol with unclaimed funds? We can add it here.",
     incident: "Contact us to list your recovery project on Unclaimed Finance.",
     chain: "Any EVM",
+    chainId: 0,
     asset: "Any ERC-20",
   },
   Card: PlaceholderCard,

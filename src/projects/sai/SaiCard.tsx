@@ -13,7 +13,7 @@ import {
 import { type ProjectCardProps } from "../types";
 import { useSaiCheck } from "./useSaiCheck";
 
-export function SaiCard({ address, enabled }: ProjectCardProps) {
+export function SaiCard({ address, enabled, chainId }: ProjectCardProps) {
   const { saiBalance, wethAmount, needsApprove, tapWethBalance, isLoading, isError } =
     useSaiCheck(address, enabled);
 
@@ -41,6 +41,7 @@ export function SaiCard({ address, enabled }: ProjectCardProps) {
 
   const handleApprove = () => {
     writeApprove({
+      chainId,
       address: SAI_ADDRESS,
       abi: SAI_ABI,
       functionName: "approve",
@@ -50,6 +51,7 @@ export function SaiCard({ address, enabled }: ProjectCardProps) {
 
   const handleCash = () => {
     writeCash({
+      chainId,
       address: CAGE_FREE_ADDRESS,
       abi: CAGE_FREE_ABI,
       functionName: "freeCash",

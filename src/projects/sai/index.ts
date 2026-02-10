@@ -9,6 +9,7 @@ export const saiProject: ProjectModule = {
     incident:
       "MakerDAO migrated from Single-Collateral DAI (SAI) to Multi-Collateral DAI in Nov 2019. SAI holders can still redeem via CageFree contract at 1 SAI = 0.005285 WETH.",
     chain: "Ethereum",
+    chainId: 1,
     asset: "WETH",
     tvl: {
       type: "balance",

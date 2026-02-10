@@ -10,6 +10,7 @@ export const csaiProject: ProjectModule = {
     incident:
       "Compound v2 cSAI holders can still redeem their tokens: exit Compound to get SAI, then convert SAI to WETH via MakerDAO CageFree at a fixed rate.",
     chain: "Ethereum",
+    chainId: 1,
     asset: "WETH",
     tvl: {
       type: "balance-with-rate",

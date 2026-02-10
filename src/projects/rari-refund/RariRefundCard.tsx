@@ -10,7 +10,7 @@ import { useRariRefund } from "./useRariRefund";
 const RARI_ARTICLE_URL =
   "https://medium.com/babylon-finance/rari-hack-reimbursement-a47560999b9c";
 
-export function RariRefundCard({ address, enabled }: ProjectCardProps) {
+export function RariRefundCard({ address, enabled, chainId }: ProjectCardProps) {
   const { address: connectedAddress } = useAccount();
   const { daiAmount, claimed, isLoading, isError } = useRariRefund(address, enabled);
   const { writeContract, data: txHash, isPending, error: txError } = useWriteContract();
@@ -21,6 +21,7 @@ export function RariRefundCard({ address, enabled }: ProjectCardProps) {
 
   const handleClaim = () => {
     writeContract({
+      chainId,
       address: RARI_REFUND_ADDRESS,
       abi: RARI_REFUND_ABI,
       functionName: "claimReimbursement",

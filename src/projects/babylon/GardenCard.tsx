@@ -14,9 +14,10 @@ const GARDEN_ARTICLE_URL =
 interface GardenCardProps {
   result: GardenResult;
   userAddress?: string;
+  chainId: number;
 }
 
-export function GardenCard({ result, userAddress }: GardenCardProps) {
+export function GardenCard({ result, userAddress, chainId }: GardenCardProps) {
   const { address: connectedAddress } = useAccount();
   const [expanded, setExpanded] = useState(false);
   const { writeContract, data: txHash, isPending, error: txError } = useWriteContract();
@@ -26,6 +27,7 @@ export function GardenCard({ result, userAddress }: GardenCardProps) {
   const handleWithdraw = () => {
     if (!userAddress) return;
     writeContract({
+      chainId,
       address: result.address,
       abi: GARDEN_ABI,
       functionName: "withdraw",

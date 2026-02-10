@@ -190,7 +190,7 @@ export function ProjectGrid({ address, checkEnabled }: ProjectGridProps) {
       {checkEnabled && address && (
         <div className="space-y-3">
           {projects.map((project) => (
-            <project.Card key={project.meta.id} address={address} enabled={checkEnabled} />
+            <project.Card key={project.meta.id} address={address} enabled={checkEnabled} chainId={project.meta.chainId} />
           ))}
         </div>
       )}

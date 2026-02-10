@@ -8,7 +8,7 @@ import { KINTO_LEFTOVER_ADDRESS, KINTO_LEFTOVER_ABI } from "./config";
 import { type ProjectCardProps } from "../types";
 import { useKintoCheck } from "./useKintoCheck";
 
-export function KintoCard({ address, enabled }: ProjectCardProps) {
+export function KintoCard({ address, enabled, chainId }: ProjectCardProps) {
   const { amount, claimed, isLoading, isError } = useKintoCheck(address, enabled);
   const { writeContract, data: txHash, isPending, error: txError } = useWriteContract();
   const { isLoading: isTxConfirming, isSuccess: isTxConfirmed } =
@@ -18,6 +18,7 @@ export function KintoCard({ address, enabled }: ProjectCardProps) {
 
   const handleClaim = () => {
     writeContract({
+      chainId,
       address: KINTO_LEFTOVER_ADDRESS,
       abi: KINTO_LEFTOVER_ABI,
       functionName: "acceptAndClaim",

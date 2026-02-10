@@ -8,9 +8,10 @@ interface GardensListProps {
   isLoading: boolean;
   isError: boolean;
   userAddress?: string;
+  chainId: number;
 }
 
-export function GardensList({ results, isLoading, isError, userAddress }: GardensListProps) {
+export function GardensList({ results, isLoading, isError, userAddress, chainId }: GardensListProps) {
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -61,7 +62,7 @@ export function GardensList({ results, isLoading, isError, userAddress }: Garden
       ) : (
         <div className="space-y-1.5">
           {results.map((result) => (
-            <GardenCard key={result.address} result={result} userAddress={userAddress} />
+            <GardenCard key={result.address} result={result} userAddress={userAddress} chainId={chainId} />
           ))}
         </div>
       )}

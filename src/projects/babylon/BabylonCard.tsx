@@ -5,7 +5,7 @@ import { useGardensCheck } from "./useGardensCheck";
 import { GardensList } from "./GardensList";
 import { TotalSummary } from "./TotalSummary";
 
-export function BabylonCard({ address, enabled }: ProjectCardProps) {
+export function BabylonCard({ address, enabled, chainId }: ProjectCardProps) {
   const gardens = useGardensCheck(address, enabled);
 
   if (!enabled) return null;
@@ -18,6 +18,7 @@ export function BabylonCard({ address, enabled }: ProjectCardProps) {
         isLoading={gardens.isLoading}
         isError={gardens.isError}
         userAddress={address}
+        chainId={chainId}
       />
       {!gardens.isLoading && (
         <TotalSummary gardenResults={gardens.results} />

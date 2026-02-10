@@ -31,6 +31,7 @@ export interface ProjectMeta {
   description: string;
   incident: string;
   chain: string;
+  chainId: number;
   asset: string;
   website?: string;
   tvl?: TvlConfig;
@@ -39,6 +40,7 @@ export interface ProjectMeta {
 export interface ProjectCardProps {
   address: Address;
   enabled: boolean;
+  chainId: number;
 }
 
 export interface ProjectModule {

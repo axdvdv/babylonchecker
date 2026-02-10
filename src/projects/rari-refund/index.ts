@@ -8,6 +8,7 @@ export const rariRefundProject: ProjectModule = {
     description: "Reimbursement for Rari Capital hack victims via Babylon Finance",
     incident: "Rari Capital was hacked in April 2022. Babylon Finance allocated DAI reimbursements for affected users. Unclaimed funds remain in the contract.",
     chain: "Ethereum",
+    chainId: 1,
     asset: "DAI",
     website: "https://medium.com/babylon-finance/rari-hack-reimbursement-a47560999b9c",
     tvl: {
